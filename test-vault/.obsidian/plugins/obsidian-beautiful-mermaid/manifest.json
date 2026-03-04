@@ -1,0 +1,9 @@
+{
+  "id": "obsidian-beautiful-mermaid",
+  "name": "Beautiful Mermaid",
+  "version": "1.0.0",
+  "minAppVersion": "1.0.0",
+  "description": "Beautiful mermaid diagram rendering for Obsidian",
+  "author": "edrickleong",
+  "isDesktopOnly": false
+}
