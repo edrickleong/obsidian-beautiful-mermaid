@@ -14,10 +14,15 @@ export function buildMermaidExtension(plugin: BeautifulMermaidPlugin): Extension
     class {
       private observer: MutationObserver;
       private rendered = new WeakMap<HTMLElement, string>();
+      private unregisterThemeChange: () => void;
 
       constructor(private view: EditorView) {
         this.observer = new MutationObserver(() => this.processEmbeds());
         this.observer.observe(view.dom, { childList: true, subtree: true });
+        this.unregisterThemeChange = plugin.onThemeChange(() => {
+          this.rendered = new WeakMap();
+          this.processEmbeds();
+        });
         requestAnimationFrame(() => this.processEmbeds());
       }
 
@@ -90,6 +95,7 @@ export function buildMermaidExtension(plugin: BeautifulMermaidPlugin): Extension
 
       destroy() {
         this.observer.disconnect();
+        this.unregisterThemeChange();
       }
     },
   );

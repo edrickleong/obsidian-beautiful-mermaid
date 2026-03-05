@@ -8,7 +8,9 @@ const ctx = await esbuild.context({
   external: ["obsidian", "electron", "@codemirror/*", "@lezer/*"],
   format: "cjs",
   target: "es2018",
-  outfile: "test-vault/.obsidian/plugins/obsidian-beautiful-mermaid/main.js",
+  outfile: watch
+    ? "test-vault/.obsidian/plugins/obsidian-beautiful-mermaid/main.js"
+    : "main.js",
   platform: "browser",
   sourcemap: watch ? "inline" : false,
   minify: !watch,

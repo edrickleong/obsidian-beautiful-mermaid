@@ -915,10 +915,10 @@ erDiagram
 
 ```mermaid
 erDiagram
-  A ||--|| B : one-to-one
-  C ||--o{ D : one-to-many
-  E |o--|{ F : opt-to-many
-  G }|--o{ H : many-to-many
+  A ||--|| B : "one-to-one"
+  C ||--o{ D : "one-to-many"
+  E |o--|{ F : "opt-to-many"
+  G }|--o{ H : "many-to-many"
 ```
 
 ## ER Diagram - Identifying

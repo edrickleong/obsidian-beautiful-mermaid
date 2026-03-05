@@ -4,6 +4,10 @@ import type { DiagramColors } from "beautiful-mermaid";
 import { buildMermaidExtension } from "./editor-extension";
 
 export default class BeautifulMermaidPlugin extends Plugin {
+  private diagrams = new Set<{ source: string; el: HTMLElement }>();
+  private themeChangeHandlers: (() => void)[] = [];
+  private lastIsDark = document.body.classList.contains("theme-dark");
+
   async onload() {
     this.registerMarkdownCodeBlockProcessor("mermaid", (source, el) => {
       el.empty();
@@ -11,6 +15,36 @@ export default class BeautifulMermaidPlugin extends Plugin {
     });
 
     this.registerEditorExtension(buildMermaidExtension(this));
+
+    this.registerEvent(
+      this.app.workspace.on("css-change", () => {
+        const isDark = document.body.classList.contains("theme-dark");
+        if (isDark === this.lastIsDark) return;
+        this.lastIsDark = isDark;
+        this.reRenderAllDiagrams();
+      }),
+    );
+  }
+
+  onThemeChange(handler: () => void): () => void {
+    this.themeChangeHandlers.push(handler);
+    return () => {
+      const idx = this.themeChangeHandlers.indexOf(handler);
+      if (idx !== -1) this.themeChangeHandlers.splice(idx, 1);
+    };
+  }
+
+  private reRenderAllDiagrams() {
+    for (const entry of this.diagrams) {
+      if (!entry.el.isConnected) {
+        this.diagrams.delete(entry);
+        continue;
+      }
+      this.renderInto(entry.source, entry.el);
+    }
+    for (const handler of this.themeChangeHandlers) {
+      handler();
+    }
   }
 
   getThemeColors(): DiagramColors {
@@ -47,6 +81,7 @@ export default class BeautifulMermaidPlugin extends Plugin {
       toggleBtn.setAttribute("aria-label", showingSource ? "View diagram" : "View source");
     });
 
+    this.diagrams.add({ source, el: diagramEl });
     this.renderInto(source, diagramEl);
     return container;
   }
